@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业微信异常投诉信息收集</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        h2 {
+            font-size: 18px;
+            margin: 25px 0 15px;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        
+        .scope-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .scope-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .scope-option:hover {
+            border-color: #07c160;
+            background-color: #f0f9f4;
+        }
+        
+        .scope-option.active {
+            border-color: #07c160;
+            background-color: #f0f9f4;
+            box-shadow: 0 2px 8px rgba(7, 193, 96, 0.15);
+        }
+        
+        .scope-option i {
+            font-size: 24px;
+            color: #07c160;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .form-section {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="text"]:focus, textarea:focus {
+            border-color: #07c160;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(7, 193, 96, 0.1);
+        }
+        
+        .help-link {
+            color: #07c160;
+            text-decoration: none;
+            font-size: 13px;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .help-link:hover {
+            text-decoration: underline;
+        }
+        
+        .help-link i {
+            margin-right: 4px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .upload-area:hover {
+            border-color: #07c160;
+            background-color: #f0f9f4;
+        }
+        
+        .upload-area i {
+            font-size: 32px;
+            color: #07c160;
+            margin-bottom: 10px;
+        }
+        
+        .submit-btn {
+            background-color: #07c160;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+        
+        .submit-btn:hover {
+            background-color: #06ae56;
+        }
+        
+        .note {
+            font-size: 13px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .or-divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            color: #999;
+        }
+        
+        .or-divider:before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        .or-divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .scope-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>企业微信异常投诉信息收集</h1>
+        <p class="description">请根据您的实际情况选择异常范围，并填写相应的信息</p>
+        
+        <h2>一、请确认异常范围</h2>
+        <div class="scope-options">
+            <div class="scope-option" data-target="single-account">
+                <i class="fas fa-user"></i>
+                <span>单个账号</span>
+            </div>
+            <div class="scope-option" data-target="group-chat">
+                <i class="fas fa-users"></i>
+                <span>群聊</span>
+            </div>
+            <div class="scope-option" data-target="whole-enterprise">
+                <i class="fas fa-building"></i>
+                <span>全企业</span>
+            </div>
+            <div class="scope-option" data-target="customer-service">
+                <i class="fas fa-headset"></i>
+                <span>客服号</span>
+            </div>
+        </div>
+        
+        <div id="single-account" class="form-section">
+            <h2>二、单个账号异常信息收集（提交以下信息之一即可）</h2>
+            
+            <div class="form-group">
+                <label for="account-complaint-cert">
+                    账号投诉凭证
+                    <a href="https://open.work.weixin.qq.com/help2/pc/14664?vid=1688850522933402&deviceid=94911f39-df77-4dd2-8420-ba86d1f8d684&version=5.0.0.8619&platform=win#3%E3%80%81%E5%A6%82%E6%9E%9C%E4%BC%81%E4%B8%9A%E9%81%87%E5%88%B0%E8%B4%A6%E5%8F%B7%E8%A2%AB%E8%AF%AF%E5%B0%81%E8%AF%AF%E9%99%90%E4%BA%86%EF%BC%8C%E8%83%BD%E6%80%8E%E6%A0%B7%E5%A4%84%E7%90%86%EF%BC%9F" class="help-link">
+                        <i class="fas fa-question-circle"></i>
+                        获取指引
+                    </a>
+                </label>
+                <textarea id="account-complaint-cert" rows="3" placeholder="请输入账号投诉凭证"></textarea>
+            </div>
+            
+            <div class="or-divider"><span>或</span></div>
+            
+            <div class="form-group">
+                <label for="employee-id">
+                    员工编号（员工投诉凭证）
+                    <a href="https://open.work.weixin.qq.com/help2/pc/20777#%E4%BA%8C%E3%80%81%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E6%8A%95%E8%AF%89%E5%87%AD%E8%AF%81" class="help-link">
+                        <i class="fas fa-question-circle"></i>
+                        获取指引
+                    </a>
+                </label>
+                <input type="text" id="employee-id" placeholder="请输入员工编号">
+            </div>
+            
+            <div class="or-divider"><span>或</span></div>
+            
+            <div class="form-group">
+                <label for="phone-wechat-id">
+                    出问题企业微信账号绑定的手机号/微信号
+                </label>
+                <input type="text" id="phone-wechat-id" placeholder="请输入手机号或微信号">
+            </div>
+        </div>
+        
+        <div id="group-chat" class="form-section">
+            <h2>二、群聊异常信息收集（提交以下信息之一即可）</h2>
+            
+            <div class="form-group">
+                <label for="group-cert">
+                    群凭证（群投诉凭证）
+                    <a href="https://open.work.weixin.qq.com/help2/pc/20777#%E4%BA%8C%E3%80%81%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E6%8A%95%E8%AF%89%E5%87%AD%E8%AF%81" class="help-link">
+                        <i class="fas fa-question-circle"></i>
+                        获取指引
+                    </a>
+                </label>
+                <textarea id="group-cert" rows="3" placeholder="请输入群凭证"></textarea>
+            </div>
+            
+            <div class="or-divider"><span>或</span></div>
+            
+            <div class="form-group">
+                <label for="group-qr-code">
+                    群二维码
+                </label>
+                <div class="upload-area">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>点击上传群二维码图片</p>
+                    <p class="note">支持 JPG、PNG 格式，大小不超过 5MB</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="whole-enterprise" class="form-section">
+            <h2>二、全企业异常信息收集（提交以下信息之一即可）</h2>
+            
+            <div class="form-group">
+                <label for="enterprise-id-2">
+                    企业ID
+                    <a href="https://open.work.weixin.qq.com/help2/pc/21445" class="help-link">
+                        <i class="fas fa-question-circle"></i>
+                        获取指引
+                    </a>
+                </label>
+                <input type="text" id="enterprise-id-2" placeholder="请输入企业ID">
+            </div>
+            
+            <div class="or-divider"><span>或</span></div>
+            
+            <div class="form-group">
+                <label for="account-complaint-cert-2">
+                    账号投诉凭证
+                    <a href="https://open.work.weixin.qq.com/help2/pc/20777#%E4%BA%8C%E3%80%81%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E6%8A%95%E8%AF%89%E5%87%AD%E8%AF%81" class="help-link">
+                        <i class="fas fa-question-circle"></i>
+                        获取指引
+                    </a>
+                </label>
+                <textarea id="account-complaint-cert-2" rows="3" placeholder="请输入账号投诉凭证"></textarea>
+            </div>
+            
+            <div class="or-divider"><span>或</span></div>
+            
+            <div class="form-group">
+                <label for="employee-id-2">
+                    员工编号（员工投诉凭证）
+                    <a href="https://open.work.weixin.qq.com/help2/pc/20777#%E4%BA%8C%E3%80%81%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E6%8A%95%E8%AF%89%E5%87%AD%E8%AF%81" class="help-link">
+                        <i class="fas fa-question-circle"></i>
+                        获取指引
+                    </a>
+                </label>
+                <input type="text" id="employee-id-2" placeholder="请输入员工编号">
+            </div>
+        </div>
+        
+        <div id="customer-service" class="form-section">
+            <h2>二、客服号异常信息收集</h2>
+            
+            <div class="form-group">
+                <label for="customer-service-id">
+                    客服号ID
+                    <a href="https://open.work.weixin.qq.com/help2/pc/17961#14%E3%80%81%E5%BE%AE%E4%BF%A1%E5%AE%A2%E6%9C%8D%E8%B4%A6%E5%8F%B7%E5%87%BA%E7%8E%B0%E5%B0%81%E7%A6%81%EF%BC%8C%E6%8F%90%E4%BA%A4%E7%94%B3%E8%AF%89%E5%8D%95%E6%97%B6%EF%BC%8C%E5%A6%82%E4%BD%95%E8%8E%B7%E5%8F%96%E5%AE%A2%E6%9C%8D%E5%8F%B7ID%EF%BC%9F" class="help-link">
+                        <i class="fas fa-question-circle"></i>
+                        获取指引
+                    </a>
+                </label>
+                <input type="text" id="customer-service-id" placeholder="请输入客服号ID">
+            </div>
+        </div>
+        
+        <button class="submit-btn">提交信息</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const scopeOptions = document.querySelectorAll('.scope-option');
+            const formSections = document.querySelectorAll('.form-section');
+            
+            // 默认选中第一个选项
+            if (scopeOptions.length > 0) {
+                scopeOptions[0].classList.add('active');
+                const targetId = scopeOptions[0].getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            }
+            
+            // 为每个选项添加点击事件
+            scopeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除所有选项的active类
+                    scopeOptions.forEach(opt => opt.classList.remove('active'));
+                    // 添加当前选项的active类
+                    this.classList.add('active');
+                    
+                    // 隐藏所有表单部分
+                    formSections.forEach(section => section.classList.remove('active'));
+                    
+                    // 显示对应的表单部分
+                    const targetId = this.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+            
+            // 上传区域点击事件
+            const uploadArea = document.querySelector('.upload-area');
+            if (uploadArea) {
+                uploadArea.addEventListener('click', function() {
+                    // 在实际应用中，这里应该触发文件选择对话框
+                    alert('在实际应用中，这里会打开文件选择器，允许您上传图片');
+                });
+            }
+            
+            // 提交按钮点击事件
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.addEventListener('click', function() {
+                alert('信息提交成功！我们将在1-3个工作日内处理您的投诉。');
+            });
+        });
+    </script>
+</body>
+</html>
